@@ -3,7 +3,7 @@
 
  * Name: Saurav Shah    
  * Date: 02/20/2026
- * Hours Spent: 20+ (ongoing)
+ * Hours Spent: 22+ (ongoing)
  * Description: A top-down action game where the player controls a scrapbot trying to 
     escape a scrapyard while avoiding hazards and collecting parts.
 
@@ -21,18 +21,29 @@ const config = {
   type: Phaser.AUTO,
   width: 800,
   height: 600,
+  backgroundColor: '#2d2d2d',
   physics: {
     default: 'arcade',
     arcade: {
-      gravity: { y: 0 },    // Top-down or side-scroller? TBD
-      debug: false
+      gravity: { y: window.gameConfig.gravity },
+      debug: false 
     }
   },
-  scene: [Boot, Preloader, TitleScene, Game, GameOver],
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH
-  }
+  },
+  scene: [
+    Boot, 
+    Preloader, 
+    TitleScene, 
+    Game, 
+    GameOver, 
+    CreditsScene
+  ]
 };
 
 const game = new Phaser.Game(config);
+
+// New Line - Awkwardly placed console log for testing purposes
+console.log("Scrapbot Escape initialized.");
