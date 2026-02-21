@@ -1,16 +1,19 @@
 /*
  * Scrapbot Escape
 
- * Name: 
- * Date:
- * Hours Spent:
+ * Name: Saurav Shah    
+ * Date: 02/20/2026
+ * Hours Spent: 20+ (ongoing)
+ * Description: A top-down action game where the player controls a scrapbot trying to 
+    escape a scrapyard while avoiding hazards and collecting parts.
+
  * Sources: Phaser 3 examples (phaser.io), OpenGameArt.org for SFX/music
  * Creative Tilt: 
- *              ---- TBD ----
- */
+ *              ---- To be added as development progresses ----
+*/
 
 
-// keep me honest
+// Honestly, I don't know if this is necessary
 'use strict'
 
 // define constraints and configure main Phaser game object
