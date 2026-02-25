@@ -33,7 +33,7 @@ class Preloader extends Phaser.Scene {
     this.load.image('bg_junkyard', 'assets/images/bg_junkyard.png');
     this.load.image('floor_metal', 'assets/images/floor_metal.png');
     this.load.image('junk_block', 'assets/images/junk_block.png');
-    this.load.image('battery', 'assets/images/battery.png');
+    this.load.image('battery', 'assets/images/battery.png'); 
     
     // Sprite sheet for player (4 frames, 32x32 each - adjust if your image is different)
     this.load.spritesheet('scrapbot', 'assets/images/scrapbot.png', {
@@ -42,11 +42,11 @@ class Preloader extends Phaser.Scene {
     });
 
     // Audio
-    this.load.audio('bgm_loop', 'assets/audio/bgm_loop.mp3');
-    this.load.audio('jump_sfx', 'assets/audio/jump.wav');
-    this.load.audio('collect_sfx', 'assets/audio/collect.wav');
-    this.load.audio('crash_sfx', 'assets/audio/crash.wav');
-    this.load.audio('ui_click', 'assets/audio/ui_click.wav');
+    this.load.audio('bgm_loop', 'assets/audio/bgm_loop.ogg');
+    this.load.audio('jump_sfx', 'assets/audio/jump.mp3');
+    this.load.audio('collect_sfx', 'assets/audio/collect.mp3');
+    this.load.audio('crash_sfx', 'assets/audio/crash.mp3');
+    this.load.audio('ui_click', 'assets/audio/ui_click.ogg');
   }
 
   create() {
