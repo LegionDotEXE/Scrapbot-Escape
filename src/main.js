@@ -5,7 +5,7 @@
  * Date: 02/20/2026
  * Hours Spent: 22+ (ongoing)
  * Description: A top-down action game where the player controls a scrapbot trying to 
-    escape a scrapyard while avoiding hazards and collecting parts.
+                escape a scrapyard while avoiding hazards and collecting parts.
 
  * Sources: Phaser 3 examples (phaser.io), OpenGameArt.org for SFX/music
  * Creative Tilt: 

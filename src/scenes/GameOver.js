@@ -30,8 +30,7 @@ class GameOver extends Phaser.Scene {
 
     // Collide player with floor
     this.physics.add.collider(this.player, this.floor);
-
-    //  GROUPS 
+    
     this.obstacles = this.physics.add.group();
     this.batteries = this.physics.add.group();
 
@@ -84,7 +83,6 @@ class GameOver extends Phaser.Scene {
     // Move obstacles manually to match speed increase
     this.obstacles.getChildren().forEach(obs => {
       obs.setVelocityX(-this.gameSpeed);
-      // Remove if off screen
       if (obs.x < -50) obs.destroy();
     });
 
