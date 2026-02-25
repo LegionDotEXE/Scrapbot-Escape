@@ -18,28 +18,37 @@ class Game extends Phaser.Scene {
     this.width = this.scale.width;
     this.height = this.scale.height;
 
-    window.gameConfig.groundY = this.height - 140;
+    // Ground placement (proportional)
+    this.groundHeight = this.height * 0.18;
+    this.groundY = this.height - this.groundHeight;
 
     // Background
     this.bg = this.add.tileSprite(0, 0, this.width, this.height, 'bg_junkyard')
       .setOrigin(0, 0);
 
     // Floor
-    this.floor = this.add.tileSprite(0, window.gameConfig.groundY, this.width, 140, 'floor_metal')
+    this.floor = this.add.tileSprite(0, this.groundY, this.width, this.groundHeight, 'floor_metal')
       .setOrigin(0, 0);
 
     this.physics.add.existing(this.floor, true);
 
-    // Player
-    this.player = this.physics.add.sprite(180, window.gameConfig.groundY - 80, 'scrapbot');
+    // -------- SCALE BASED ON SCREEN --------
+    this.spriteScale = this.height / 900;   // balanced scaling factor
 
-    this.player.setScale(3);
+    // Player
+    this.player = this.physics.add.sprite(
+      this.width * 0.18,
+      this.groundY - (32 * this.spriteScale),
+      'scrapbot'
+    );
+
+    this.player.setScale(this.spriteScale * 1.6);
     this.player.setCollideWorldBounds(true);
     this.player.play('run');
 
-    // FIX FLICKER — custom hitbox AFTER scaling
-    this.player.body.setSize(18, 28);
-    this.player.body.setOffset(7, 4);
+    // Clean hitbox (prevents flicker)
+    this.player.body.setSize(22, 28);
+    this.player.body.setOffset(5, 4);
 
     this.physics.add.collider(this.player, this.floor);
 
@@ -56,14 +65,14 @@ class Game extends Phaser.Scene {
 
     // UI
     this.scoreText = this.add.text(40, 40, 'Score: 0', {
-      fontSize: '34px',
+      fontSize: `${Math.floor(this.height * 0.045)}px`,
       fill: '#fff',
       fontFamily: 'monospace'
     });
 
     // Spawn
     this.time.addEvent({
-      delay: 1600,
+      delay: 1700,
       callback: this.spawnObstacle,
       callbackScope: this,
       loop: true
@@ -79,28 +88,26 @@ class Game extends Phaser.Scene {
 
     const onGround = this.player.body.blocked.down;
 
-    // PROFESSIONAL JUMP
+    // Responsive jump
     if ((Phaser.Input.Keyboard.JustDown(this.cursors.up) ||
          Phaser.Input.Keyboard.JustDown(this.spaceKey)) && onGround) {
 
-      this.player.setVelocityY(-900);  // STRONGER impulse
+      this.player.setVelocityY(-this.height * 1.2);
       this.sound.play('jump_sfx', { volume: 0.3 });
     }
 
-    // Better gravity (platformer feel)
+    // Better gravity feel
     if (this.player.body.velocity.y > 0) {
-      // Falling faster
-      this.player.setGravityY(1800);
+      this.player.setGravityY(this.height * 2.2);
     } else {
-      // Rising normal
-      this.player.setGravityY(1200);
+      this.player.setGravityY(this.height * 1.4);
     }
 
-    // Smooth scrolling
-    this.bg.tilePositionX += 1.3;
-    this.floor.tilePositionX += 5;
+    // Background movement
+    this.bg.tilePositionX += 1.2;
+    this.floor.tilePositionX += 4;
 
-    // Gradual speed increase (capped)
+    // Controlled speed ramp
     if (this.gameSpeed < this.maxSpeed) {
       this.gameSpeed += 0.03;
     }
@@ -108,12 +115,12 @@ class Game extends Phaser.Scene {
     // Move obstacles
     this.obstacles.getChildren().forEach(obs => {
       obs.setVelocityX(-this.gameSpeed);
-      if (obs.x < -120) obs.destroy();
+      if (obs.x < -100) obs.destroy();
     });
 
     this.batteries.getChildren().forEach(bat => {
       bat.setVelocityX(-this.gameSpeed);
-      if (bat.x < -120) bat.destroy();
+      if (bat.x < -100) bat.destroy();
     });
 
     this.scoreText.setText('Score: ' + this.score);
@@ -122,10 +129,11 @@ class Game extends Phaser.Scene {
   spawnObstacle() {
     if (this.isGameOver) return;
 
+    // Proportional lanes
     const lanes = [
-      window.gameConfig.groundY - 50,
-      window.gameConfig.groundY - 170,
-      window.gameConfig.groundY - 290
+      this.groundY - 30,
+      this.groundY - this.height * 0.18,
+      this.groundY - this.height * 0.35
     ];
 
     const laneY = Phaser.Utils.Array.GetRandom(lanes);
@@ -133,18 +141,18 @@ class Game extends Phaser.Scene {
 
     if (rand > 0.35) {
       const obs = this.obstacles.create(this.width + 100, laneY, 'junk_block');
-      obs.setScale(2.8);
+      obs.setScale(this.spriteScale * 1.5);
       obs.setVelocityX(-this.gameSpeed);
       obs.body.allowGravity = false;
     } else {
-      const bat = this.batteries.create(this.width + 100, laneY - 80, 'battery');
-      bat.setScale(2.5);
+      const bat = this.batteries.create(this.width + 100, laneY - 40, 'battery');
+      bat.setScale(this.spriteScale * 1.4);
       bat.setVelocityX(-this.gameSpeed);
       bat.body.allowGravity = false;
 
       this.tweens.add({
         targets: bat,
-        y: bat.y - 25,
+        y: bat.y - 20,
         duration: 600,
         yoyo: true,
         repeat: -1
