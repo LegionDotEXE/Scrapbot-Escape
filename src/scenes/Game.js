@@ -8,37 +8,46 @@ class Game extends Phaser.Scene {
   init() {
     this.score = 0;
     this.isGameOver = false;
-    this.gameSpeed = window.gameConfig.obstacleSpeed;
-    this.spawnTimer = null;
+
+    this.baseSpeed = 240;
+    this.maxSpeed = 420;
+    this.gameSpeed = this.baseSpeed;
   }
 
   create() {
     this.width = this.scale.width;
     this.height = this.scale.height;
 
-    // Background moves slow
-    this.bg = this.add.tileSprite(0, 0, this.width, this.height, 'bg_junkyard').setOrigin(0, 0);
-    
-    // Floor moves faster
-    this.floor = this.add.tileSprite(0, window.gameConfig.groundY, this.width, 100, 'floor_metal').setOrigin(0, 0);
-    this.physics.add.existing(this.floor, true); // Static physics body
+    window.gameConfig.groundY = this.height - 140;
 
-    // Player Setup
-    this.player = this.physics.add.sprite(100, 400, 'scrapbot');
+    // Background
+    this.bg = this.add.tileSprite(0, 0, this.width, this.height, 'bg_junkyard')
+      .setOrigin(0, 0);
+
+    // Floor
+    this.floor = this.add.tileSprite(0, window.gameConfig.groundY, this.width, 140, 'floor_metal')
+      .setOrigin(0, 0);
+
+    this.physics.add.existing(this.floor, true);
+
+    // Player
+    this.player = this.physics.add.sprite(180, window.gameConfig.groundY - 80, 'scrapbot');
+
+    this.player.setScale(3);
     this.player.setCollideWorldBounds(true);
     this.player.play('run');
 
-    // Collide player with floor
+    // FIX FLICKER — custom hitbox AFTER scaling
+    this.player.body.setSize(18, 28);
+    this.player.body.setOffset(7, 4);
+
     this.physics.add.collider(this.player, this.floor);
 
-    // groups for obstacles and batteries
+    // Groups
     this.obstacles = this.physics.add.group();
     this.batteries = this.physics.add.group();
 
-    // Hit obstacle = Die
     this.physics.add.collider(this.player, this.obstacles, this.hitObstacle, null, this);
-    
-    // Collect battery = Score
     this.physics.add.overlap(this.player, this.batteries, this.collectBattery, null, this);
 
     // Input
@@ -46,112 +55,120 @@ class Game extends Phaser.Scene {
     this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
     // UI
-    this.scoreText = this.add.text(20, 20, 'Score: 0', {
-      fontSize: '24px',
+    this.scoreText = this.add.text(40, 40, 'Score: 0', {
+      fontSize: '34px',
       fill: '#fff',
       fontFamily: 'monospace'
     });
 
-
-    // Spawn obstacles 
-    this.spawnTimer = this.time.addEvent({
-      delay: window.gameConfig.enemySpawnRate,
+    // Spawn
+    this.time.addEvent({
+      delay: 1600,
       callback: this.spawnObstacle,
       callbackScope: this,
       loop: true
     });
 
-    // Play Music
-    this.bgm = this.sound.add('bgm_loop', { loop: true, volume: 0.5 });
+    // Music
+    this.bgm = this.sound.add('bgm_loop', { loop: true, volume: 0.4 });
     this.bgm.play();
   }
 
   update() {
     if (this.isGameOver) return;
 
-    // Jump Logic
-    if ((this.cursors.up.isDown || this.spaceKey.isDown) && this.player.body.touching.down) {
-      this.player.setVelocityY(window.gameConfig.jumpForce);
+    const onGround = this.player.body.blocked.down;
+
+    // PROFESSIONAL JUMP
+    if ((Phaser.Input.Keyboard.JustDown(this.cursors.up) ||
+         Phaser.Input.Keyboard.JustDown(this.spaceKey)) && onGround) {
+
+      this.player.setVelocityY(-900);  // STRONGER impulse
       this.sound.play('jump_sfx', { volume: 0.3 });
     }
 
-    // Scroll Backgrounds based on gameSpeed
-    this.bg.tilePositionX += this.gameSpeed * 0.2; 
-    this.floor.tilePositionX += this.gameSpeed;
+    // Better gravity (platformer feel)
+    if (this.player.body.velocity.y > 0) {
+      // Falling faster
+      this.player.setGravityY(1800);
+    } else {
+      // Rising normal
+      this.player.setGravityY(1200);
+    }
 
-    // Increase difficulty over time 
-    this.gameSpeed += 0.05; 
-    
-    // Move obstacles manually to match speed increase
+    // Smooth scrolling
+    this.bg.tilePositionX += 1.3;
+    this.floor.tilePositionX += 5;
+
+    // Gradual speed increase (capped)
+    if (this.gameSpeed < this.maxSpeed) {
+      this.gameSpeed += 0.03;
+    }
+
+    // Move obstacles
     this.obstacles.getChildren().forEach(obs => {
       obs.setVelocityX(-this.gameSpeed);
-      // Remove if off screen
-      if (obs.x < -50) obs.destroy();
+      if (obs.x < -120) obs.destroy();
     });
 
-    // Move batteries
     this.batteries.getChildren().forEach(bat => {
       bat.setVelocityX(-this.gameSpeed);
-      if (bat.x < -50) bat.destroy();
+      if (bat.x < -120) bat.destroy();
     });
 
-    // Update Score Text
     this.scoreText.setText('Score: ' + this.score);
   }
 
   spawnObstacle() {
     if (this.isGameOver) return;
 
-    // Randomly decide if we spawn an obstacle or a battery
+    const lanes = [
+      window.gameConfig.groundY - 50,
+      window.gameConfig.groundY - 170,
+      window.gameConfig.groundY - 290
+    ];
+
+    const laneY = Phaser.Utils.Array.GetRandom(lanes);
     const rand = Math.random();
 
-    if (rand > 0.3) {
-      // Spawn Obstacle
-      const obs = this.obstacles.create(this.width + 50, window.gameConfig.groundY - 30, 'junk_block');
-      obs.setImmovable(true);
+    if (rand > 0.35) {
+      const obs = this.obstacles.create(this.width + 100, laneY, 'junk_block');
+      obs.setScale(2.8);
       obs.setVelocityX(-this.gameSpeed);
-      obs.body.allowGravity = false; // Keep it moving horizontally only
+      obs.body.allowGravity = false;
     } else {
-      // Spawn Battery
-      const batY = window.gameConfig.groundY - 30 - (Math.random() * 100); // Sometimes high, sometimes low
-      const bat = this.batteries.create(this.width + 50, batY, 'battery');
+      const bat = this.batteries.create(this.width + 100, laneY - 80, 'battery');
+      bat.setScale(2.5);
       bat.setVelocityX(-this.gameSpeed);
       bat.body.allowGravity = false;
-      
-      // Simple bobbing animation
+
       this.tweens.add({
         targets: bat,
-        y: bat.y - 20,
-        duration: 500,
+        y: bat.y - 25,
+        duration: 600,
         yoyo: true,
         repeat: -1
       });
     }
-
-    // Make spawn rate faster as game speeds up
-    this.spawnTimer.delay = Math.max(800, window.gameConfig.enemySpawnRate - (this.gameSpeed * 2));
   }
 
   collectBattery(player, battery) {
     battery.disableBody(true, true);
     this.score += 10;
     this.sound.play('collect_sfx', { volume: 0.4 });
-    
-    // Will add more here----------------------------------
   }
 
   hitObstacle(player, obstacle) {
     if (this.isGameOver) return;
-    
+
     this.isGameOver = true;
     this.physics.pause();
     player.setTint(0xff0000);
     player.anims.stop();
-    
+
     this.sound.play('crash_sfx', { volume: 0.6 });
     this.bgm.stop();
 
-    // Delay before going to Game Over
     this.time.delayedCall(1000, () => {
       this.scene.start('gameover', { score: this.score });
     });

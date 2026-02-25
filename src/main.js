@@ -13,7 +13,6 @@
 */
 
 
-// Honestly, I don't know if this is necessary
 'use strict'
 
 // define constraints and configure main Phaser game object

@@ -29,13 +29,12 @@ class Preloader extends Phaser.Scene {
     });
 
     // --- LOAD ASSETS ---
-    // Images
     this.load.image('bg_junkyard', 'assets/images/bg_junkyard.png');
     this.load.image('floor_metal', 'assets/images/floor_metal.png');
     this.load.image('junk_block', 'assets/images/junk_block.png');
     this.load.image('battery', 'assets/images/battery.png'); 
     
-    // Sprite sheet for player (4 frames, 32x32 each - adjust if your image is different)
+    // Sprite sheet
     this.load.spritesheet('scrapbot', 'assets/images/scrapbot.png', {
       frameWidth: 32,
       frameHeight: 32
@@ -51,12 +50,17 @@ class Preloader extends Phaser.Scene {
 
   create() {
     // Create Animations
-    this.anims.create({
-      key: 'run',
-      frames: this.anims.generateFrameNumbers('scrapbot', { start: 0, end: 3 }),
-      frameRate: 10,
-      repeat: -1
-    });
+    // Check if spritesheet loaded correctly
+    if (this.textures.exists('scrapbot')) {
+      this.anims.create({
+        key: 'run',
+        frames: this.anims.generateFrameNumbers('scrapbot', { start: 0, end: 3 }),
+        frameRate: 10,
+        repeat: -1
+      });
+    } else {
+      console.error("Scrapbot sprite not found!");
+    }
 
     // Go to Title Screen
     this.scene.start('title');
