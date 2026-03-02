@@ -2,7 +2,6 @@
 
 // Gameplay constants — Initially just a placeholder
 
-// Gameplay constants — Initially just a placeholder
 
 // Attaching to window so other files can see it without imports
 window.gameConfig = {
@@ -17,3 +16,4 @@ window.gameConfig = {
 
 console.log("Game config loaded!", window.gameConfig);
 
+ 
