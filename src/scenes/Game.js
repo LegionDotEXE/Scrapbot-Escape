@@ -9,7 +9,7 @@ class Game extends Phaser.Scene {
     this.score = 0;
     this.isGameOver = false;
 
-    this.baseSpeed = 240;
+    this.baseSpeed = 250;
     this.maxSpeed = 420;
     this.gameSpeed = this.baseSpeed;
   }
@@ -19,7 +19,7 @@ class Game extends Phaser.Scene {
     this.height = this.scale.height;
 
     // Ground placement (proportional)
-    this.groundHeight = this.height * 0.18;
+    this.groundHeight = this.height * 0.10;
     this.groundY = this.height - this.groundHeight;
 
     // Background
@@ -37,7 +37,7 @@ class Game extends Phaser.Scene {
 
     // Player
     this.player = this.physics.add.sprite(
-      this.width * 0.18,
+      this.width * 0.15,
       this.groundY - (32 * this.spriteScale),
       'scrapbot'
     );
@@ -46,9 +46,9 @@ class Game extends Phaser.Scene {
     this.player.setCollideWorldBounds(true);
     this.player.play('run');
 
-    // Clean hitbox (prevents flicker)
+    // // Clean hitbox (prevents flicker)
     this.player.body.setSize(22, 28);
-    this.player.body.setOffset(5, 4);
+    this.player.body.setOffset(6, 4);
 
     this.physics.add.collider(this.player, this.floor);
 

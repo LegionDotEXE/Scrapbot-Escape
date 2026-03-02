@@ -1,3 +1,4 @@
+
 // Preloader.jS Prefab
 
 class Preloader extends Phaser.Scene {
@@ -36,12 +37,12 @@ class Preloader extends Phaser.Scene {
     
     // Sprite sheet
     this.load.spritesheet('scrapbot', 'assets/images/scrapbot.png', {
-      frameWidth: 32,
-      frameHeight: 32
+      frameWidth: 16,
+      frameHeight: 22
     });
 
     // Audio
-    this.load.audio('bgm_loop', 'assets/audio/bgm_loop.ogg');
+    this.load.audio('bgm_loop', 'assets/audio/bgm_loop.wav');
     this.load.audio('jump_sfx', 'assets/audio/jump.mp3');
     this.load.audio('collect_sfx', 'assets/audio/collect.mp3');
     this.load.audio('crash_sfx', 'assets/audio/crash.mp3');
@@ -55,8 +56,8 @@ class Preloader extends Phaser.Scene {
       this.anims.create({
         key: 'run',
         frames: this.anims.generateFrameNumbers('scrapbot', { start: 0, end: 3 }),
-        frameRate: 10,
-        repeat: -1
+        // frameRate: 10,
+        // repeat: -1
       });
     } else {
       console.error("Scrapbot sprite not found!");
