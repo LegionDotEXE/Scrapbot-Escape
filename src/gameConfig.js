@@ -5,7 +5,7 @@
 
 // Attaching to window so other files can see it without imports
 window.gameConfig = {
-  playerSpeed: 200,
+  playerSpeed: 250,
   jumpForce: -950,      
   gravity: 150,
   enemySpawnRate: 1200, // Milliseconds between spawns
@@ -16,4 +16,4 @@ window.gameConfig = {
 
 console.log("Game config loaded!", window.gameConfig);
 
- 
+  
