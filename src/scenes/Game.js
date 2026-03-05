@@ -32,7 +32,6 @@ class Game extends Phaser.Scene {
 
     this.physics.add.existing(this.floor, true);
 
-    // -------- SCALE BASED ON SCREEN --------
     this.spriteScale = this.height / 900;   // balanced scaling factor
 
     // Player
@@ -63,12 +62,32 @@ class Game extends Phaser.Scene {
     this.cursors = this.input.keyboard.createCursorKeys();
     this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
-    // UI
-    this.scoreText = this.add.text(40, 40, 'Score: 0', {
-      fontSize: `${Math.floor(this.height * 0.045)}px`,
-      fill: '#fff',
-      fontFamily: 'monospace'
-    });
+    // Added the box around the score counter
+    const padding = 20;
+    const boxWidth = 120;
+    const boxHeight = 40;  
+    const fontSize = Math.floor(this.height * 0.045);
+
+    this.scoreBox = this.add.rectangle(padding + boxWidth / 2, padding + boxHeight / 2, boxWidth, boxHeight, 0x1a1a1a, 0.9);
+    this.scoreBox.setStrokeStyle(3, 0xff9900); 
+    this.scoreBox.setScrollFactor(0); 
+    this.scoreBox.setDepth(10);
+
+    // "Score" Label 
+    this.add.text(padding + boxWidth / 2, padding - 10, 'SCORE', {
+      fontSize: '14px',
+      fill: '#ff9900',
+      fontFamily: 'monospace',
+      letterSpacing: 2
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(11);
+
+    this.scoreText = this.add.text(padding + boxWidth / 2, padding + boxHeight / 2, '0', {
+      fontSize: `${fontSize}px`,
+      fill: '#ffffff',
+      fontFamily: 'monospace',
+      fontStyle: 'bold'
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(11);
+
 
     // Spawn
     this.time.addEvent({
@@ -107,9 +126,9 @@ class Game extends Phaser.Scene {
     this.bg.tilePositionX += 1.2;
     this.floor.tilePositionX += 4;
 
-    // Controlled speed ramp
+    // Controlled speed increase
     if (this.gameSpeed < this.maxSpeed) {
-      this.gameSpeed += 0.03;
+      this.gameSpeed += 0.07;
     }
 
     // Move obstacles
@@ -123,7 +142,7 @@ class Game extends Phaser.Scene {
       if (bat.x < -100) bat.destroy();
     });
 
-    this.scoreText.setText('Score: ' + this.score);
+    this.scoreText.setText(this.score);
   }
 
   spawnObstacle() {
@@ -164,6 +183,15 @@ class Game extends Phaser.Scene {
     battery.disableBody(true, true);
     this.score += 10;
     this.sound.play('collect_sfx', { volume: 0.4 });
+    
+    // Added this recently 
+    this.tweens.add({
+      targets: this.scoreBox,
+      scaleX: 1.1,
+      scaleY: 1.1,
+      duration: 100,
+      yoyo: true
+    });
   }
 
   hitObstacle(player, obstacle) {

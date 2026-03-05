@@ -9,7 +9,13 @@
 
  * Sources: Phaser 3 examples (phaser.io), OpenGameArt.org for SFX/music
  * Creative Tilt: 
- *              ---- To be added as development progresses ----
+ *              Piskelapp.com
+ *              Tweens for UI elements and effects
+ *              Added a score box with a label and dynamic score text in the Game scene
+ *              Implemented a glitch effect on the Game Over text and box using tweens
+ *              Created a blinking effect for the start button on the Title Screen
+ *              Added a shadow effect to the title text on the Title Screen
+ * 
 */
 
 

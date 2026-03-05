@@ -51,7 +51,6 @@ class Preloader extends Phaser.Scene {
 
   create() {
     // Create Animations
-    // Check if spritesheet loaded correctly
     if (this.textures.exists('scrapbot')) {
       this.anims.create({
         key: 'run',
